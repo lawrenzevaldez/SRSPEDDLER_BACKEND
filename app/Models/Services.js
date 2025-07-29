@@ -289,7 +289,7 @@ class Services extends Model {
         try {
             let row = await trx.table('srs_users')
                     .where('id', user_id)
-                    .update({ password: password, user_role: user_role })
+                    .update({ password: password /*, user_role: user_role*/ })
 
             await trx.commit()
             return (row == 0) ? false : true
@@ -305,7 +305,7 @@ class Services extends Model {
         try {
             await trx
             .table('srs_users')
-            .insert({ username: username, password: userpass, account_no: username, user_role: userrole, branch: userbranch, user_firstname: userfirstname, user_lastname: userlastname })
+            .insert({ username: username, password: userpass, account_no: username, user_role: 0, branch: Env.get('BRANCH_NAME', ''), user_firstname: username, user_lastname: username })
 
             await trx.commit()
             return true
