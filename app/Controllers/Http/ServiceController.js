@@ -8,9 +8,9 @@ const Env = use("Env");
 class ServiceController {
   constructor() {
     this.WooCommerce = new WooCommerceRestApi({
-      url: "https://srspeddler.com/novaliches/",
-      consumerKey: "ck_2bd1a79961a0281b15a0dc4e3c97f01bb752ee44",
-      consumerSecret: "cs_c65d873a1578b1f778dfa532a70ca01566c235d1",
+      url: Env.get("url", ""),
+      consumerKey: Env.get("consumerKey", ""),
+      consumerSecret: Env.get("consumerSecret", ""),
       version: "wc/v3",
     });
   }
@@ -94,11 +94,9 @@ class ServiceController {
           return response.status(200).send("Successfully Inserted");
         }
       } else {
-        return response
-          .status(408)
-          .send({
-            msg: "an error occured while updating the status of products.",
-          });
+        return response.status(408).send({
+          msg: "an error occured while updating the status of products.",
+        });
       }
     } catch (e) {
       console.log(e);
