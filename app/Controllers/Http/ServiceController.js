@@ -72,7 +72,12 @@ class ServiceController {
   }
 
   async update_products_unpublished({ request, response }) {
-    let { list_of_ids } = request.post("list_of_ids");
+    let { list_of_ids, location_id, location_name, user_id } = request.post([
+      "list_of_ids",
+      "location_id",
+      "location_name",
+      "user_id",
+    ]);
     try {
       let data = {
         status: "publish",
