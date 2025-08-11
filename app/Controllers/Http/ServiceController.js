@@ -99,7 +99,7 @@ class ServiceController {
             user_id,
             location_id,
             location_name,
-            `INSERT PRODUCTS ${list_of_ids}`
+            `INSERT PRODUCT ${list_of_ids}`
           );
           return response.status(200).send("Successfully Inserted");
         }
@@ -137,7 +137,7 @@ class ServiceController {
             user_id,
             location_id,
             location_name,
-            `INSERT PRODUCT ${product_id}`
+            `UNPUBLISHED PRODUCT ${product_id}`
           );
           return response.status(200).send({ status: true });
         }
