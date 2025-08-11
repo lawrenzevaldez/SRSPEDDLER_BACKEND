@@ -132,7 +132,7 @@ class ServiceController {
             user_id,
             location_id,
             location_name,
-            `INSERT PRODUCT ${product_id} PRICE: ${product_price} AND STOCK: ${product_stock}`
+            `INSERT PRODUCT ${product_id}`
           );
           return response.status(200).send({ status: true });
         }
