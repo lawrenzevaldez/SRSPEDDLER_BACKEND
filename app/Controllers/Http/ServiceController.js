@@ -99,7 +99,7 @@ class ServiceController {
             user_id,
             location_id,
             location_name,
-            `INSERT PRODUCT ${product_id} PRICE: ${product_price} AND STOCK: ${product_stock}`
+            `INSERT PRODUCTS ${list_of_ids}`
           );
           return response.status(200).send("Successfully Inserted");
         }
