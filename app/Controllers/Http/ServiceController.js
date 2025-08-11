@@ -90,7 +90,12 @@ class ServiceController {
       if (pub_id.length == list_of_ids.length) {
         let row = await ServicesMod.update_products_unpublished(list_of_ids);
         if (row) {
-          // await ServicesMod.audit_trail(user_id, location_id, location_name, `INSERT PRODUCT ${product_id} PRICE: ${product_price} AND STOCK: ${product_stock}`)
+          await ServicesMod.audit_trail(
+            user_id,
+            location_id,
+            location_name,
+            `INSERT PRODUCT ${product_id} PRICE: ${product_price} AND STOCK: ${product_stock}`
+          );
           return response.status(200).send("Successfully Inserted");
         }
       } else {
@@ -123,7 +128,12 @@ class ServiceController {
       if (prodUpdate.status == 200) {
         let row = await ServicesMod.update_products_status(product_id);
         if (row) {
-          // await ServicesMod.audit_trail(user_id, location_id, location_name, `INSERT PRODUCT ${product_id} PRICE: ${product_price} AND STOCK: ${product_stock}`)
+          await ServicesMod.audit_trail(
+            user_id,
+            location_id,
+            location_name,
+            `INSERT PRODUCT ${product_id} PRICE: ${product_price} AND STOCK: ${product_stock}`
+          );
           return response.status(200).send({ status: true });
         }
       } else {
@@ -291,7 +301,15 @@ class ServiceController {
     let { order_id, status } = request.post(["order_id", "status"]);
     try {
       let row = await ServicesMod.update_order(order_id, status);
-      return response.status(200).send(row);
+      if (row) {
+        await ServicesMod.audit_trail(
+          user_id,
+          location_id,
+          location_name,
+          `UPDATE ORDER ${order_id} STATUS: ${status}`
+        );
+        return response.status(200).send({ status: true });
+      }
     } catch (e) {
       console.log(e);
       return response.status(408).send(e.message);
