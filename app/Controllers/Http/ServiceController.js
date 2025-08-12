@@ -361,6 +361,9 @@ class ServiceController {
       userbranch,
       userfirstname,
       userlastname,
+      location_id,
+      location_name,
+      user_id,
     } = request.only([
       "username",
       "userpass",
@@ -368,6 +371,9 @@ class ServiceController {
       "userbranch",
       "userfirstname",
       "userlastname",
+      "location_id",
+      "location_name",
+      "user_id",
     ]);
     try {
       let res = await ServicesMod.add_user(
@@ -379,6 +385,12 @@ class ServiceController {
         userlastname
       );
       if (res) {
+        await ServicesMod.audit_trail(
+          user_id,
+          location_id,
+          location_name,
+          `ADDED USER ${username}`
+        );
         return response.status(200).send(res);
       } else {
         return response.status(408).send(res.message);
@@ -390,13 +402,29 @@ class ServiceController {
   }
 
   async update_user({ request, response }) {
-    let { user_id, password, user_role } = request.only([
+    let {
+      location_id,
+      location_name,
+      admin_user_id,
+      user_id,
+      password,
+      user_role,
+    } = request.only([
+      "location_id",
+      "location_name",
+      "admin_user_id",
       "user_id",
       "password",
       "user_role",
     ]);
     try {
       let res = await ServicesMod.update_user(user_id, password, user_role);
+      await ServicesMod.audit_trail(
+        admin_user_id,
+        location_id,
+        location_name,
+        `UPDATE USER ${user_id}`
+      );
       return response.status(200).send(res);
     } catch (e) {
       console.log(e);
