@@ -1,10 +1,10 @@
-'use strict'
+"use strict";
 
 /** @type {import('@adonisjs/framework/src/Env')} */
-const Env = use('Env')
+const Env = use("Env");
 
 /** @type {import('@adonisjs/ignitor/src/Helpers')} */
-const Helpers = use('Helpers')
+const Helpers = use("Helpers");
 
 module.exports = {
   /*
@@ -16,7 +16,7 @@ module.exports = {
   | interacting with SQL databases.
   |
   */
-  connection: Env.get('DB_CONNECTION', 'sqlite'),
+  connection: Env.get("DB_CONNECTION", "sqlite"),
 
   /*
   |--------------------------------------------------------------------------
@@ -30,11 +30,13 @@ module.exports = {
   |
   */
   sqlite: {
-    client: 'sqlite3',
+    client: "sqlite3",
     connection: {
-      filename: Helpers.databasePath(`${Env.get('DB_DATABASE', 'development')}.sqlite`)
+      filename: Helpers.databasePath(
+        `${Env.get("DB_DATABASE", "development")}.sqlite`
+      ),
     },
-    useNullAsDefault: true
+    useNullAsDefault: true,
   },
 
   /*
@@ -48,14 +50,19 @@ module.exports = {
   |
   */
   mysql: {
-    client: 'mysql',
+    client: "mysql",
     connection: {
-      host: Env.get('DB_HOST', 'localhost'),
-      port: Env.get('DB_PORT', ''),
-      user: Env.get('DB_USER', 'root'),
-      password: Env.get('DB_PASSWORD', ''),
-      database: Env.get('DB_DATABASE', 'adonis')
-    }
+      host: Env.get("DB_HOST", "localhost"),
+      port: Env.get("DB_PORT", ""),
+      user: Env.get("DB_USER", "root"),
+      password: Env.get("DB_PASSWORD", ""),
+      database: Env.get("DB_DATABASE", "adonis"),
+    },
+    pool: {
+      min: 2,
+      max: 10,
+      acquireTimeoutMillis: 60000,
+    },
   },
 
   /*
@@ -69,351 +76,361 @@ module.exports = {
   |
   */
   pg: {
-    client: 'pg',
+    client: "pg",
     connection: {
-      host: Env.get('DB_HOST', 'localhost'),
-      port: Env.get('DB_PORT', ''),
-      user: Env.get('DB_USER', 'root'),
-      password: Env.get('DB_PASSWORD', ''),
-      database: Env.get('DB_DATABASE', 'adonis')
-    }
+      host: Env.get("DB_HOST", "localhost"),
+      port: Env.get("DB_PORT", ""),
+      user: Env.get("DB_USER", "root"),
+      password: Env.get("DB_PASSWORD", ""),
+      database: Env.get("DB_DATABASE", "adonis"),
+    },
   },
   online_mysql: {
-    client: 'mysql',
-    prefix: Env.get('ONLINE_DB_PREFIX', ''),
+    client: "mysql",
+    prefix: Env.get("ONLINE_DB_PREFIX", ""),
     connection: {
-      host: Env.get('ONLINE_DB_HOST', 'localhost'),
-      port: Env.get('ONLINE_DB_PORT', ''),
-      user: Env.get('ONLINE_DB_USER', 'root'),
-      password: Env.get('ONLINE_DB_PASSWORD', ''),
-      database: Env.get('ONLINE_DB_DATABASE', 'adonis')
-    }
+      host: Env.get("ONLINE_DB_HOST", "localhost"),
+      port: Env.get("ONLINE_DB_PORT", ""),
+      user: Env.get("ONLINE_DB_USER", "root"),
+      password: Env.get("ONLINE_DB_PASSWORD", ""),
+      database: Env.get("ONLINE_DB_DATABASE", "adonis"),
+    },
+    pool: {
+      min: 2,
+      max: 10,
+      acquireTimeoutMillis: 60000,
+    },
   },
 
   //MSSQL BRANCH DATABASE
   SRSMNOVA: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMNOVA_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMNOVA_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SRSMIMU: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMIMU_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMIMU_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SRSMNAVO: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMNAVO_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMNAVO_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SRSMTON: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMTON_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMTON_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SRSMCAMA: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMCAMA_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMCAMA_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SRSMANT1GF: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMANT1GF_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMANT1GF_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SRSMANT2EM: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMANT2EM_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMANT2EM_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SRSMMALA: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMMALA_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMMALA_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SRSMGAL: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMGAL_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMGAL_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SRSMCAINTA: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMCAINTA_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMCAINTA_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SRSMVAL: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMVAL_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMVAL_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SRSMBSL: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMBSL_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMBSL_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SRSMPUN: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMPUN_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMPUN_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SRSMPAT: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMPAT_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMPAT_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SRSMKUM: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMKUM_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMKUM_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SRSMCAINTA2: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMCAINTA2_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMCAINTA2_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SRSMPEDRO: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMPEDRO_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMPEDRO_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SRSMPINAS: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMPINAS_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMPINAS_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SRSMALAM: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMALAM_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMALAM_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SRSMBAG: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMBAG_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMBAG_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SRSMMUZ: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMMUZ_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMMUZ_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SRSMMOL: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMMOL_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMMOL_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SRSMANGA: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMANGA_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMANGA_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SRSMMONTB: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMMONTB_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMMONTB_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SAGORA: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SAGORA_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SAGORA_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SMARILAO: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SMARILAO_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SMARILAO_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SMARILAO2: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SMARILAO2_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SMARILAO2_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SRSMBSL2: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SRSMBSL2_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SRSMBSL2_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   ISIDRO: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('ISIDRO_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("ISIDRO_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   SSTAMARIA: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MS133DB_HOST', 'localhost'),
-      user: Env.get('MS133DB_USER', 'root'),
-      password: Env.get('MS133DB_PASSWORD', ''),
-      database: Env.get('SSTAMARIA_DATABASE', 'adonis')
+      host: Env.get("MS133DB_HOST", "localhost"),
+      user: Env.get("MS133DB_USER", "root"),
+      password: Env.get("MS133DB_PASSWORD", ""),
+      database: Env.get("SSTAMARIA_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
   // ./MSSQL BRANCH DATABASE
 
   //FOR PRODUCT BATCH UPLOAD ONLY
   mssql: {
-    client: 'mssql',
+    client: "mssql",
     connection: {
-      host: Env.get('MSDB_HOST', 'localhost'),
-      user: Env.get('MSDB_USER', 'root'),
-      password: Env.get('MSDB_PASSWORD', ''),
-      database: Env.get('MSDB_DATABASE', 'adonis')
+      host: Env.get("MSDB_HOST", "localhost"),
+      user: Env.get("MSDB_USER", "root"),
+      password: Env.get("MSDB_PASSWORD", ""),
+      database: Env.get("MSDB_DATABASE", "adonis"),
     },
-    debug: false
+    debug: false,
   },
 
   mysql91: {
-    client: 'mysql',
+    client: "mysql",
     connection: {
-      host: Env.get('91DB_HOST', 'localhost'),
-      port: Env.get('91DB_PORT', ''),
-      user: Env.get('91DB_USER', 'root'),
-      password: Env.get('91DB_PASSWORD', ''),
-      database: Env.get('91DB_DATABASE', 'adonis')
-    }
+      host: Env.get("91DB_HOST", "localhost"),
+      port: Env.get("91DB_PORT", ""),
+      user: Env.get("91DB_USER", "root"),
+      password: Env.get("91DB_PASSWORD", ""),
+      database: Env.get("91DB_DATABASE", "adonis"),
+    },
+    pool: {
+      min: 2,
+      max: 10,
+      acquireTimeoutMillis: 60000,
+    },
   },
   // ./FOR PRODUCT BATCH UPLOAD ONLY
-}
+};
