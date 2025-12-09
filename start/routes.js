@@ -77,6 +77,9 @@ Route.group(() => {
     "/get_transaction_details",
     "ServiceController.get_transaction_details"
   );
+
+  //ONLINE WEBSITE
+  Route.get("/getWebsiteUsers", "ServiceController.getWebsiteUsers");
 }).prefix("api");
 
 Route.any("*", function ({ view, request }) {

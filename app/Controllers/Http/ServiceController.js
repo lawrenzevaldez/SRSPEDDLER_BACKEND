@@ -16,37 +16,44 @@ class ServiceController {
   }
 
   async get_products({ request, response }) {
-    let { p_page, p_search, p_currentSort, p_currentSortDir } = request.post([
-      "p_page",
-      "p_search",
-      "p_currentSort",
-      "p_currentSortDir",
-    ]);
     try {
-      let [res, page_count] = await ServicesMod.get_products(
+      const { p_page, p_search, p_currentSort, p_currentSortDir } =
+        request.post();
+
+      const [products, page_count] = await ServicesMod.get_products(
         p_page,
         p_search,
         p_currentSort,
         p_currentSortDir
       );
-      for (let i = 0; i < res.length; i++) {
-        let tRow = await ServicesMod.get_products_location(res[i].ProductID);
-        console.log(tRow);
-        res[i] = {
-          product_id: res[i].ProductID,
-          product_name: res[i].productName,
-          product_mode: res[i].excluded,
-          product_status: res[i].published == 1 ? "Published" : "Unpublished",
-          product_price: tRow.Price,
-          product_stock: tRow.Stock,
-          // product_price: 0,
-          // product_stock: 0
-        };
+
+      if (!products.length) {
+        return response.status(200).send({ res: [], page_count });
       }
+
+      const productIDs = products.map((p) => p.ProductID);
+      const locations = await ServicesMod.get_products_location(productIDs);
+
+      const locationMap = Object.fromEntries(
+        locations.map((loc) => [loc.ProductID, loc])
+      );
+
+      const res = products.map((item) => {
+        const loc = locationMap[item.ProductID] || {};
+        return {
+          product_id: item.ProductID,
+          product_name: item.productName,
+          product_mode: item.excluded,
+          product_status: item.published === 1 ? "Published" : "Unpublished",
+          product_price: loc.Price ?? 0,
+          product_stock: loc.Stock ?? 0,
+        };
+      });
+
       return response.status(200).send({ res, page_count });
-    } catch (e) {
-      console.log(e);
-      return response.status(408).send(e.message);
+    } catch (error) {
+      console.error("Error in get_products:", error);
+      return response.status(500).send({ message: error.message });
     }
   }
 
@@ -72,10 +79,9 @@ class ServiceController {
   }
 
   async update_products_unpublished({ request, response }) {
-    let { list_of_ids, location_id, location_name, user_id } = request.post([
+    let { list_of_ids, display_name, user_id } = request.post([
       "list_of_ids",
-      "location_id",
-      "location_name",
+      "display_name",
       "user_id",
     ]);
     try {
@@ -97,8 +103,8 @@ class ServiceController {
         if (row) {
           await ServicesMod.audit_trail(
             user_id,
-            location_id,
-            location_name,
+            "",
+            display_name,
             `INSERT PRODUCT ${list_of_ids}`
           );
           return response.status(200).send("Successfully Inserted");
@@ -115,10 +121,9 @@ class ServiceController {
   }
 
   async update_products_status({ request, response }) {
-    let { product_id, location_id, location_name, user_id } = request.post([
+    let { product_id, display_name, user_id } = request.post([
       "product_id",
-      "location_id",
-      "location_name",
+      "display_name",
       "user_id",
     ]);
     try {
@@ -135,8 +140,8 @@ class ServiceController {
         if (row) {
           await ServicesMod.audit_trail(
             user_id,
-            location_id,
-            location_name,
+            "",
+            display_name,
             `UNPUBLISHED PRODUCT ${product_id}`
           );
           return response.status(200).send({ status: true });
@@ -220,8 +225,7 @@ class ServiceController {
       product_price_ws,
       product_mode,
       product_mode_ws,
-      location_id,
-      location_name,
+      display_name,
       user_id,
     } = request.post([
       "product_id",
@@ -230,7 +234,7 @@ class ServiceController {
       "product_mode",
       "product_mode_ws",
       "location_id",
-      "location_name",
+      "display_name",
       "user_id",
     ]);
     try {
@@ -263,8 +267,8 @@ class ServiceController {
           if (row) {
             await ServicesMod.audit_trail(
               user_id,
-              location_id,
-              location_name,
+              "",
+              display_name,
               `MANUAL PRODUCT PRICING ${product_price}`
             );
             return response.status(200).send(true);
@@ -278,8 +282,8 @@ class ServiceController {
         if (row) {
           await ServicesMod.audit_trail(
             user_id,
-            location_id,
-            location_name,
+            "",
+            display_name,
             `AUTO PRODUCT PRICING ${product_price}`
           );
           return response.status(200).send(true);
@@ -315,38 +319,6 @@ class ServiceController {
         );
         return response.status(200).send({ status: true });
       }
-    } catch (e) {
-      console.log(e);
-      return response.status(408).send(e.message);
-    }
-  }
-
-  async get_users({ request, response }) {
-    let { p_page, p_search, p_currentSort, p_currentSortDir } = request.post([
-      "p_page",
-      "p_search",
-      "p_currentSort",
-      "p_currentSortDir",
-    ]);
-    try {
-      let [resF, page_count] = await ServicesMod.get_users(
-        p_page,
-        p_search,
-        p_currentSort,
-        p_currentSortDir
-      );
-      let res = [];
-      for (const row of resF) {
-        res.push({
-          id: row.id,
-          username: row.username,
-          password: row.password,
-          location_name: row.branch,
-          user_role: row.user_role,
-          user_role_details: await this.role_cheker(row.user_role),
-        });
-      }
-      return response.status(200).send({ res, page_count });
     } catch (e) {
       console.log(e);
       return response.status(408).send(e.message);
@@ -402,33 +374,43 @@ class ServiceController {
   }
 
   async update_user({ request, response }) {
-    let {
-      location_id,
-      location_name,
+    const {
       admin_user_id,
       user_id,
-      password,
+      peddler_customer_no,
+      peddler_customer_name,
+      peddler_customer_percentage,
+      user_login,
+      display_name,
       user_role,
     } = request.only([
-      "location_id",
-      "location_name",
       "admin_user_id",
       "user_id",
-      "password",
+      "peddler_customer_no",
+      "peddler_customer_name",
+      "peddler_customer_percentage",
+      "user_login",
+      "display_name",
       "user_role",
     ]);
+
     try {
-      let res = await ServicesMod.update_user(user_id, password, user_role);
-      await ServicesMod.audit_trail(
-        admin_user_id,
-        location_id,
-        location_name,
-        `UPDATE USER ${user_id}`
+      const res = await ServicesMod.update_website_user(
+        user_id,
+        peddler_customer_no,
+        peddler_customer_name,
+        peddler_customer_percentage,
+        user_login,
+        display_name,
+        user_role
       );
+
+      await ServicesMod.audit_trail(admin_user_id, `UPDATE USER ${user_id}`);
+
       return response.status(200).send(res);
     } catch (e) {
-      console.log(e);
-      return response.status(408).send(e.message);
+      console.error(e);
+      return response.status(500).send({ status: "error", message: e.message });
     }
   }
 
@@ -521,12 +503,9 @@ class ServiceController {
   }
 
   async get_total_order_count_month({ request, response }) {
-    let { branch, account_no } = request.only(["branch", "account_no"]);
+    let { account_no } = request.only(["account_no"]);
     try {
-      let row = await ServicesMod.get_total_order_count_month(
-        branch,
-        account_no
-      );
+      let row = await ServicesMod.get_total_order_count_month(account_no);
       return response.status(200).send({ row });
     } catch (e) {
       console.log(e);
@@ -962,6 +941,28 @@ class ServiceController {
     }
   }
   // ./SAVING OF PRODUCTS AT DB
+
+  // ONLINE WEBSITE
+  async get_users({ request, response }) {
+    let { p_page, p_search, p_currentSort, p_currentSortDir } = request.post([
+      "p_page",
+      "p_search",
+      "p_currentSort",
+      "p_currentSortDir",
+    ]);
+    try {
+      let [res, page_count] = await ServicesMod.get_users(
+        p_page,
+        p_search,
+        p_currentSort,
+        p_currentSortDir
+      );
+      return response.status(200).send({ res, page_count });
+    } catch (e) {
+      console.log(e);
+      return response.status(408).send(e.message);
+    }
+  }
 }
 
 module.exports = ServiceController;

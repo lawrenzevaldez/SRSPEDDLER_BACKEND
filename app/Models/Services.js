@@ -6,23 +6,27 @@ const moment = use("moment");
 
 class Services extends Model {
   async get_products(p_page, p_search, p_currentSort, p_currentSortDir) {
-    let search = p_search == null ? "%%" : `%${p_search}%`;
-    let row = await Db.select(
-      "id",
-      "ProductID",
-      "productName",
-      "published",
-      "excluded"
-    )
-      .from("online_shop_products")
-      .where(`productName`, "like", search)
-      .andWhere("published", 1)
-      // .andWhere('post_type', 'product')
-      // .andWhere('post_status', 'publish')
-      .orderBy(p_currentSort, p_currentSortDir)
-      .paginate(p_page, 10);
-    await Db.close();
-    return [row.data, row.lastPage];
+    const search = p_search ? `%${p_search}%` : "%%";
+
+    try {
+      const row = await Db.select(
+        "id",
+        "ProductID",
+        "productName",
+        "published",
+        "excluded"
+      )
+        .from("online_shop_products")
+        .where("productName", "like", search)
+        .andWhere("published", 1)
+        .orderBy(p_currentSort || "ProductID", p_currentSortDir || "ASC")
+        .paginate(p_page || 1, 10);
+
+      return [row.data, row.lastPage];
+    } catch (error) {
+      console.error("Error in get_products:", error);
+      throw error;
+    }
   }
 
   async get_products_unpublished(
@@ -204,24 +208,38 @@ class Services extends Model {
     return [row.data, row.lastPage];
   }
 
-  async get_products_location(ID) {
-    let row = await Db.connection("online_mysql")
-      .select(
-        "product_price.meta_value as Price",
-        "product_stock.meta_value as Stock"
-      )
-      .from("posts as p")
-      .leftJoin(`${DbPrefix}postmeta as product_price`, function () {
-        this.on("p.ID", "=", "product_price.post_id");
-      })
-      .leftJoin(`${DbPrefix}postmeta as product_stock`, function () {
-        this.on("p.ID", "=", "product_stock.post_id");
-      })
-      .where("p.ID", ID)
-      .andWhere("product_price.meta_key", "_regular_price")
-      .andWhere("product_stock.meta_key", "_stock");
-    await Db.close();
-    return row.length == 0 ? "" : row[0];
+  async get_products_location(productIDs) {
+    if (!Array.isArray(productIDs) || productIDs.length === 0) return [];
+
+    try {
+      const rows = await Db.connection("online_mysql")
+        .select(
+          "p.ID as ProductID",
+          "product_price.meta_value as Price",
+          "product_stock.meta_value as Stock"
+        )
+        .from("posts as p")
+        .leftJoin(`${DbPrefix}postmeta as product_price`, function () {
+          this.on("p.ID", "=", "product_price.post_id").andOn(
+            "product_price.meta_key",
+            "=",
+            Db.raw("'_regular_price'")
+          );
+        })
+        .leftJoin(`${DbPrefix}postmeta as product_stock`, function () {
+          this.on("p.ID", "=", "product_stock.post_id").andOn(
+            "product_stock.meta_key",
+            "=",
+            Db.raw("'_stock'")
+          );
+        })
+        .whereIn("p.ID", productIDs);
+
+      return rows;
+    } catch (error) {
+      console.error("Error in get_products_location_bulk:", error);
+      throw error;
+    }
   }
 
   async update_product_details(ID, product_price, product_stock, location_id) {
@@ -248,12 +266,12 @@ class Services extends Model {
     }
   }
 
-  async audit_trail(user_id, location_id, location_name, message) {
+  async audit_trail(user_id, location_id = "", display_name, message) {
     try {
       await Db.table("audit_trail").insert({
         user_id,
         location_id: location_id,
-        location_name: location_name,
+        display_name: display_name,
         message: message,
       });
       await Db.close();
@@ -266,21 +284,17 @@ class Services extends Model {
   async add_location_product(product_id, location_id) {
     const trx = await Db.connection("online_mysql").beginTransaction();
     try {
-      await trx
-        .table("postmeta")
-        .insert({
-          post_id: product_id,
-          meta_key: `wcmlim_regular_price_at_${location_id}`,
-          meta_value: 0,
-        });
+      await trx.table("postmeta").insert({
+        post_id: product_id,
+        meta_key: `wcmlim_regular_price_at_${location_id}`,
+        meta_value: 0,
+      });
 
-      await trx
-        .table("postmeta")
-        .insert({
-          post_id: product_id,
-          meta_key: `wcmlim_stock_at_${location_id}`,
-          meta_value: 0,
-        });
+      await trx.table("postmeta").insert({
+        post_id: product_id,
+        meta_key: `wcmlim_stock_at_${location_id}`,
+        meta_value: 0,
+      });
 
       await trx.commit();
       return true;
@@ -326,7 +340,7 @@ class Services extends Model {
     }
   }
 
-  async get_users(p_page, p_search, p_currentSort, p_currentSortDir) {
+  async get_users_old(p_page, p_search, p_currentSort, p_currentSortDir) {
     let search = p_search == null ? "%%" : `%${p_search}%`;
     let row = await Db.select("*")
       .from("srs_users")
@@ -365,17 +379,15 @@ class Services extends Model {
   ) {
     const trx = await Db.beginTransaction();
     try {
-      await trx
-        .table("srs_users")
-        .insert({
-          username: username,
-          password: userpass,
-          account_no: username,
-          user_role: 0,
-          branch: Env.get("BRANCH_NAME", ""),
-          user_firstname: username,
-          user_lastname: username,
-        });
+      await trx.table("srs_users").insert({
+        username: username,
+        password: userpass,
+        account_no: username,
+        user_role: 0,
+        branch: Env.get("BRANCH_NAME", ""),
+        user_firstname: username,
+        user_lastname: username,
+      });
 
       await trx.commit();
       return true;
@@ -431,7 +443,7 @@ class Services extends Model {
 
   async get_total_order_amount(branch, account_no) {
     try {
-      let row = await Db.connection(branch.toString())
+      let row = await Db.connection("mssql")
         .from("FinishedPayments")
         .where("AccountNo", account_no.toString())
         .andWhere("Remarks", "peddler")
@@ -446,7 +458,7 @@ class Services extends Model {
 
   async get_total_order_count(branch, account_no) {
     try {
-      let row = await Db.connection(branch.toString())
+      let row = await Db.connection("mssql")
         .from("FinishedPayments")
         .where("AccountNo", account_no.toString())
         .andWhere("Remarks", "peddler")
@@ -465,7 +477,7 @@ class Services extends Model {
         .startOf("month")
         .format("YYYY-MM-DD HH:mm:ss");
       let endofMonth = moment().endOf("month").format("YYYY-MM-DD HH:mm:ss");
-      let row = await Db.connection(branch.toString())
+      let row = await Db.connection("mssql")
         .from("FinishedPayments")
         .whereBetween("LogDate", [startofMonth, endofMonth])
         .andWhere("AccountNo", account_no.toString())
@@ -479,13 +491,13 @@ class Services extends Model {
     }
   }
 
-  async get_total_order_count_month(branch, account_no) {
+  async get_total_order_count_month(account_no) {
     try {
       let startofMonth = moment()
         .startOf("month")
         .format("YYYY-MM-DD HH:mm:ss");
       let endofMonth = moment().endOf("month").format("YYYY-MM-DD HH:mm:ss");
-      let row = await Db.connection(branch.toString())
+      let row = await Db.connection("mssql")
         .from("FinishedPayments")
         .whereBetween("LogDate", [startofMonth, endofMonth])
         .andWhere("AccountNo", account_no.toString())
@@ -519,7 +531,7 @@ class Services extends Model {
     }
 
     try {
-      let row = await Db.connection(branch.toString()).raw(`SELECT 
+      let row = await Db.connection("mssql").raw(`SELECT 
                             TransactionNo, 
                             TerminalNo, 
                             Amount, 
@@ -537,7 +549,7 @@ class Services extends Model {
                             WHERE AccountNo = '${account_no}' AND remarks = 'peddler'
                         ) AS PaginatedPayments
                         WHERE RowNum BETWEEN ${minPage} AND ${maxPage};`);
-      let lastPage = await Db.connection(branch.toString())
+      let lastPage = await Db.connection("mssql")
         .from("FinishedPayments")
         .where("AccountNo", account_no)
         .andWhere("remarks", "peddler")
@@ -551,7 +563,7 @@ class Services extends Model {
 
   async get_transaction_details(TransactionNo, TerminalNo, branch) {
     try {
-      let row = await Db.connection(branch.toString())
+      let row = await Db.connection("mssql")
         .select("Barcode", "Description", "UOM", "TotalQty", "Price", "Points")
         .from("FinishedSales")
         .where("TransactionNo", TransactionNo)
@@ -753,6 +765,159 @@ class Services extends Model {
     }
   }
   // ./FOR PRODUCT BATCH UPLOAD ONLY
+
+  // ONLINE WEBSITE
+  async get_users(p_page, p_search, p_currentSort, p_currentSortDir) {
+    const searchCondition =
+      p_search && p_search.trim() !== ""
+        ? `AND (
+         CAST(wp_users.ID AS CHAR) LIKE '%${p_search}%' 
+         OR wp_users.user_login LIKE '%${p_search}%'
+         OR wp_users.display_name LIKE '%${p_search}%'
+       )`
+        : "";
+
+    const sql = `
+    SELECT 
+      wp_users.ID,
+      wp_users.display_name,
+      wp_users.user_login,
+      MAX(CASE WHEN wp_usermeta.meta_key = '_peddler_customer_no' THEN wp_usermeta.meta_value END) AS peddler_customer_no,
+      MAX(CASE WHEN wp_usermeta.meta_key = '_peddler_customer_name' THEN wp_usermeta.meta_value END) AS peddler_customer_name,
+      MAX(CASE WHEN wp_usermeta.meta_key = '_peddler_customer_percentage' THEN wp_usermeta.meta_value END) AS peddler_customer_percentage,
+      MAX(CASE WHEN wp_usermeta.meta_key = '_peddler_user_role' THEN wp_usermeta.meta_value END) AS user_role
+    FROM wp_users
+    LEFT JOIN wp_usermeta ON wp_usermeta.user_id = wp_users.ID
+    WHERE EXISTS (
+      SELECT 1 FROM wp_usermeta um
+      WHERE um.user_id = wp_users.ID
+        AND um.meta_key = 'primary_blog'
+        AND um.meta_value = '5'
+    )
+    ${searchCondition}
+    GROUP BY wp_users.ID
+    ORDER BY ${p_currentSort} ${p_currentSortDir}
+    LIMIT ${(p_page - 1) * 10}, 10
+  `;
+
+    const row = await Db.connection("online_mysql").raw(sql);
+
+    const totalSql = `
+    SELECT COUNT(*) AS total
+    FROM wp_users
+    WHERE EXISTS (
+      SELECT 1 FROM wp_usermeta um
+      WHERE um.user_id = wp_users.ID
+        AND um.meta_key = 'primary_blog'
+        AND um.meta_value = '5'
+    )
+    ${searchCondition}
+  `;
+    const totalRow = await Db.connection("online_mysql").raw(totalSql);
+
+    const total = totalRow[0][0].total;
+    const lastPage = Math.ceil(total / 10);
+
+    return row[0] ? [row[0], lastPage] : [[], 0];
+  }
+
+  async update_website_user(
+    user_id,
+    peddler_customer_no,
+    peddler_customer_name,
+    peddler_customer_percentage,
+    user_login,
+    display_name,
+    user_role
+  ) {
+    const trxLocal = await Db.beginTransaction();
+    const trxRemote = await Db.connection("online_mysql").beginTransaction();
+
+    try {
+      const wpUserRaw = await trxRemote.raw(
+        "SELECT user_pass FROM wp_users WHERE ID = ? LIMIT 1",
+        [user_id]
+      );
+
+      const wpUser = wpUserRaw[0][0] || wpUserRaw[0];
+      const user_pass = wpUser ? wpUser.user_pass : null;
+
+      if (!user_pass) {
+        response.message = "User password not found in wp_users";
+        await trxLocal.rollback();
+        await trxRemote.rollback();
+        return response;
+      }
+
+      const upsertLocalQuery = `
+      INSERT INTO website_users
+        (user_id, user_pass, peddler_no, user_login, display_name, role)
+      VALUES (?, ?, ?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE
+        user_pass = VALUES(user_pass),
+        peddler_no = VALUES(peddler_no),
+        user_login = VALUES(user_login),
+        display_name = VALUES(display_name),
+        role = VALUES(role)
+    `;
+      await trxLocal.raw(upsertLocalQuery, [
+        user_id,
+        user_pass,
+        peddler_customer_no,
+        user_login,
+        display_name,
+        user_role,
+      ]);
+
+      const existingMetaRaw = await trxRemote.raw(
+        "SELECT meta_key FROM wp_usermeta WHERE user_id = ?",
+        [user_id]
+      );
+      const existingMetaKeys = (existingMetaRaw[0] || []).map(
+        (row) => row.meta_key
+      );
+
+      const metaData = [
+        ["_peddler_customer_no", peddler_customer_no],
+        ["_peddler_customer_name", peddler_customer_name],
+        ["_peddler_customer_percentage", peddler_customer_percentage],
+        ["_peddler_user_role", user_role],
+      ];
+
+      for (const [meta_key, meta_value] of metaData) {
+        if (existingMetaKeys.includes(meta_key)) {
+          await trxRemote.raw(
+            "UPDATE wp_usermeta SET meta_value = ? WHERE user_id = ? AND meta_key = ?",
+            [meta_value, user_id, meta_key]
+          );
+        }
+      }
+
+      const insertMissing = metaData.filter(
+        ([meta_key]) => !existingMetaKeys.includes(meta_key)
+      );
+      if (insertMissing.length > 0) {
+        const values = insertMissing.map(() => "(?, ?, ?)").join(", ");
+        const bindings = insertMissing.flatMap(([meta_key, meta_value]) => [
+          user_id,
+          meta_key,
+          meta_value,
+        ]);
+        const insertQuery = `INSERT INTO wp_usermeta (user_id, meta_key, meta_value) VALUES ${values}`;
+        await trxRemote.raw(insertQuery, bindings);
+      }
+
+      await trxLocal.commit();
+      await trxRemote.commit();
+
+      return true;
+    } catch (e) {
+      console.log(e);
+      await trxLocal.rollback();
+      await trxRemote.rollback();
+      return false;
+    }
+  }
 }
 
 module.exports = new Services();

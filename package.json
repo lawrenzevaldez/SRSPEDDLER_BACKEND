@@ -28,11 +28,13 @@
     "@adonisjs/session": "^1.0.27",
     "@adonisjs/shield": "^1.0.8",
     "@woocommerce/woocommerce-rest-api": "^1.0.1",
+    "bcryptjs": "^3.0.3",
     "exceljs": "^4.4.0",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.30.1",
     "mssql": "^4.1.0",
     "mysql": "^2.18.1",
+    "wordpress-hash-node": "^1.0.0",
     "wpapi": "^1.2.2"
   },
   "autoload": {
