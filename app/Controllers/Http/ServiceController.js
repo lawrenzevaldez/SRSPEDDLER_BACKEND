@@ -405,7 +405,12 @@ class ServiceController {
         user_role
       );
 
-      await ServicesMod.audit_trail(admin_user_id, `UPDATE USER ${user_id}`);
+      await ServicesMod.audit_trail(
+        admin_user_id,
+        "",
+        display_name,
+        `UPDATE USER ${user_id}`
+      );
 
       return response.status(200).send(res);
     } catch (e) {
