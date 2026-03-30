@@ -33,7 +33,7 @@ module.exports = {
     client: "sqlite3",
     connection: {
       filename: Helpers.databasePath(
-        `${Env.get("DB_DATABASE", "development")}.sqlite`
+        `${Env.get("DB_DATABASE", "development")}.sqlite`,
       ),
     },
     useNullAsDefault: true,
@@ -94,6 +94,39 @@ module.exports = {
       user: Env.get("ONLINE_DB_USER", "root"),
       password: Env.get("ONLINE_DB_PASSWORD", ""),
       database: Env.get("ONLINE_DB_DATABASE", "adonis"),
+    },
+    pool: {
+      min: 2,
+      max: 10,
+      acquireTimeoutMillis: 60000,
+    },
+  },
+
+  mysql_srspos: {
+    client: "mysql",
+    connection: {
+      host: Env.get("SRSPOSMYDB_HOST", "localhost"),
+      port: Env.get("SRSPOSMYDB_PORT", ""),
+      user: Env.get("SRSPOSMYDB_USER", "root"),
+      password: Env.get("SRSPOSMYDB_PASSWORD", ""),
+      database: Env.get("SRSPOSMYDB_DATABASE", "adonis"),
+    },
+    pool: {
+      min: 2,
+      max: 10,
+      acquireTimeoutMillis: 60000,
+    },
+  },
+
+  mssql_srspos: {
+    client: "mssql",
+    connection: {
+      host: Env.get("SRSPOSMSDB_HOST", "localhost"),
+      user: Env.get("SRSPOSMSDB_USER", "root"),
+      password: Env.get("SRSPOSMSDB_PASSWORD", ""),
+      database: Env.get("SRSPOSMSDB_DATABASE", "adonis"),
+      requestTimeout: 150000,
+      connectionTimeout: 150000,
     },
     pool: {
       min: 2,

@@ -1,4 +1,4 @@
-'use strict'
+"use strict";
 
 /*
 |--------------------------------------------------------------------------
@@ -17,9 +17,29 @@
 |     Make sure to pass relative path from the project root.
 */
 
-const { Ignitor } = require('@adonisjs/ignitor')
+const { Ignitor } = require("@adonisjs/ignitor");
 
-new Ignitor(require('@adonisjs/fold'))
+new Ignitor(require("@adonisjs/fold"))
   .appRoot(__dirname)
   .fireHttpServer()
-  .catch(console.error)
+  .then(async () => {
+    const CronScheduler = use("App/Tasks/PeddlerCustomers");
+    const WebsiteScheduler = use("App/Tasks/SyncCustomers");
+    console.log("✅ Cron Runner started...");
+
+    // Run every 60 seconds
+    setInterval(async () => {
+      try {
+        await CronScheduler.run();
+      } catch (error) {
+        console.error("❌ PeddlerScheduler error:", error);
+      }
+
+      try {
+        await WebsiteScheduler.run();
+      } catch (error) {
+        console.error("❌ WebsiteScheduler error:", error);
+      }
+    }, 60 * 1000);
+  })
+  .catch(console.error);

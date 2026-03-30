@@ -25,21 +25,21 @@ Route.group(() => {
   Route.post("/get_products", "ServiceController.get_products");
   Route.post(
     "/get_products_unpublished",
-    "ServiceController.get_products_unpublished"
+    "ServiceController.get_products_unpublished",
   );
   Route.post(
     "/update_products_unpublished",
-    "ServiceController.update_products_unpublished"
+    "ServiceController.update_products_unpublished",
   );
   Route.post("/get_products_oos", "ServiceController.get_products_oos");
   Route.post("/get_orders", "ServiceController.get_orders");
   Route.post(
     "/update_product_excluded",
-    "ServiceController.update_product_excluded"
+    "ServiceController.update_product_excluded",
   );
   Route.post(
     "/update_products_status",
-    "ServiceController.update_products_status"
+    "ServiceController.update_products_status",
   );
   Route.post("/get_order_items", "ServiceController.get_order_items");
   Route.post("/update_order", "ServiceController.update_order");
@@ -49,37 +49,64 @@ Route.group(() => {
   Route.post("/add_user", "ServiceController.add_user");
   Route.post("/get_users_lists", "ServiceController.get_users_lists");
   Route.post("/get_user_details", "ServiceController.get_user_details");
+  Route.post("/send_to_pos", "ServiceController.send_to_pos");
   Route.get("/addProductsDB", "ServiceController.addProductsDB"); // FOR SAVING OF PRODUCTS AT DB
   Route.get("/getWooProducts", "ServiceController.getWooProducts");
   Route.get("/getproductcat", "ServiceController.getproductcat");
   Route.get("/get_branches", "ServiceController.get_branches");
   Route.get(
     "/get_total_order_amount",
-    "ServiceController.get_total_order_amount"
+    "ServiceController.get_total_order_amount",
   );
   Route.get(
     "/get_total_order_count",
-    "ServiceController.get_total_order_count"
+    "ServiceController.get_total_order_count",
   );
   Route.get(
     "/get_total_order_amount_month",
-    "ServiceController.get_total_order_amount_month"
+    "ServiceController.get_total_order_amount_month",
   );
   Route.get(
     "/get_total_order_count_month",
-    "ServiceController.get_total_order_count_month"
+    "ServiceController.get_total_order_count_month",
   );
   Route.get(
     "/get_list_of_transactions",
-    "ServiceController.get_list_of_transactions"
+    "ServiceController.get_list_of_transactions",
   );
   Route.get(
     "/get_transaction_details",
-    "ServiceController.get_transaction_details"
+    "ServiceController.get_transaction_details",
   );
 
   //ONLINE WEBSITE
   Route.get("/getWebsiteUsers", "ServiceController.getWebsiteUsers");
+
+  //DOWNLINE
+  Route.post("/getDownlineCustomer", "ServiceController.getDownlineCustomer");
+  Route.post(
+    "/getDownlineCustomerTransaction",
+    "ServiceController.getDownlineCustomerTransaction",
+  );
+
+  Route.get("/fetchBannerUrl", "ServiceController.fetchBannerUrl");
+  Route.post("/uploadImage", "ServiceController.uploadImage");
+
+  Route.get("/export-excel", "ServiceController.exportExcel");
+
+  Route.get("/get-coupons", "ServiceController.OnlineGetAllCoupons");
+  Route.get("/get-coupon-details", "ServiceController.getCouponDetails");
+  Route.post("/create-coupon", "ServiceController.OnlineCreateCoupon");
+  Route.post("/update-coupon", "ServiceController.OnlineUpdateCoupon");
+  Route.post("/delete-coupon", "ServiceController.OnlineDeleteCoupon");
+
+  Route.get("/search-products", "ServiceController.SearchProducts");
+
+  Route.get("/select-product", "ServiceController.ProductDetails");
+
+  Route.get("/get-categories", "ServiceController.getAllCategories");
+
+  Route.post("/audit-logs", "ServiceController.AuditLogs");
 }).prefix("api");
 
 Route.any("*", function ({ view, request }) {
