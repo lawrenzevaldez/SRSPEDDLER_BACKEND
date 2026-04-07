@@ -1120,7 +1120,7 @@ class ServiceController {
     try {
       const baseUrl = `${Env.get("url")}wp-content/uploads/sites/${Env.get("PRIMARY_BLOG")}`;
 
-      const BANNER_COUNT = 2; // change to 3, 4, etc.
+      const BANNER_COUNT = Env.get("banner_count"); // change to 3, 4, etc.
 
       const banners = Array.from(
         { length: BANNER_COUNT },
